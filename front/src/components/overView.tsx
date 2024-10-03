@@ -91,9 +91,9 @@ const OverviewSection: React.FC = () => {
       </div>
 
       {/* Version desktop (inchangée) */}
-      <div className="hidden md:flex md:flex-row justify-center items-start md:space-x-4 relative">
+      <div className="hidden md:flex md:flex-row justify-center items-start md:space-x-8 relative">
         {overviewItems.map((item, index) => (
-          <div key={index} className="w-1/3 flex flex-col items-center">
+          <div key={index} className="flex flex-col items-center">
             <motion.div
               className={`w-48 h-48 rounded-full bg-white shadow-lg flex flex-col items-center justify-center cursor-pointer transition-all ${activeItem === index ? 'scale-110 z-10' : 'hover:scale-105'}`}
               onClick={() => setActiveItem(activeItem === index ? null : index)}
@@ -123,13 +123,13 @@ const OverviewSection: React.FC = () => {
         {activeItem !== null && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: 400 }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
             className="mt-8 bg-white rounded-lg shadow-xl p-6 w-full max-w-4xl mx-auto hidden md:block"
           >
-            <div className="flex flex-row space-x-6">
-              <img src={overviewItems[activeItem].image} alt={overviewItems[activeItem].title} className="w-2/3 h-auto object-cover rounded-md" />
+            <div className="flex flex-row space-x-6 h-full">
+              <img src={overviewItems[activeItem].image} alt={overviewItems[activeItem].title} className="w-1/3 h-full object-cover rounded-md" />
               <div>
                 <h4 className="text-2xl font-bold text-green-800 mb-2">{overviewItems[activeItem].title}</h4>
                 <h5 className="text-xl text-green-600 mb-3">{overviewItems[activeItem].subtitle}</h5>

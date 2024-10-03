@@ -4,9 +4,7 @@ WORKDIR /app
 
 COPY ./front/package.json .
 
-RUN apk add --no-cache git
-
-RUN npm install
+RUN apk add --no-cache git; npm install
 
 COPY ./front .
 

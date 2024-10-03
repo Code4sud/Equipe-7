@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {FeatureGroup, LayersControl, MapContainer, TileLayer} from "react-leaflet";
+import {FeatureGroup, Popup, Circle, MapContainer, TileLayer} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import {HeatmapLayerFactory} from "@vgrid/react-leaflet-heatmap-layer";
@@ -85,6 +85,30 @@ const SimpleMap = () => {
         1.0: "#ADD8E6",
     };
 
+    const disableMapInteraction = () => {
+        if (mapRef.current) {
+            const map = mapRef.current;
+            map.dragging.disable();
+            map.touchZoom.disable();
+            map.doubleClickZoom.disable();
+            map.scrollWheelZoom.disable();
+            map.boxZoom.disable();
+            map.keyboard.disable();
+        }
+    };
+
+    const enableMapInteraction = () => {
+        if (mapRef.current) {
+            const map = mapRef.current;
+            map.dragging.enable();
+            map.touchZoom.enable();
+            map.doubleClickZoom.enable();
+            map.scrollWheelZoom.enable();
+            map.boxZoom.enable();
+            map.keyboard.enable();
+        }
+    };
+
     return (
         <MapContainer
             center={[latitude, longitude]}
@@ -94,64 +118,39 @@ const SimpleMap = () => {
             maxBounds={bounds}
             maxBoundsViscosity={1.0}
             ref={mapRef}
-            style={{height: "100vh", width: "100vw"}}
-            scrollWheelZoom={true}
-            touchZoom={true}
+            style={{height: "100%", width: "100%"}}
+            scrollWheelZoom={false}
+            touchZoom={false}
+            bounds={bounds}
+            zoomControl={false}
         >
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap | CartoDB</a> contributors'
                 url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
             />
 
-            <LayersControl position="topright">
-                <LayersControl.Overlay name="Road Pollution Heatmap" checked>
-                    <FeatureGroup pathOptions={{color: "purple"}}>
-                        <HeatmapLayer
-                            points={heatMapDataRoad}
-                            longitudeExtractor={(m) => m[1]}
-                            latitudeExtractor={(m) => m[0]}
-                            intensityExtractor={(m) => parseFloat(m[2].toString())}
-                            radius={25}
-                            blur={18}
-                            maxZoom={13}
-                            opacity={roadOpacity}
-                            gradient={roadHeatmapGradient}
-                        />
-                    </FeatureGroup>
-                </LayersControl.Overlay>
-
-                <LayersControl.Overlay name="Air Pollution Heatmap" checked>
-                    <FeatureGroup pathOptions={{color: "purple"}}>
-                        <HeatmapLayer
-                            points={heatMapDataAir}
-                            longitudeExtractor={(m) => m[1]}
-                            latitudeExtractor={(m) => m[0]}
-                            intensityExtractor={(m) => parseFloat(m[2].toString())}
-                            radius={25}
-                            blur={18}
-                            maxZoom={13}
-                            opacity={airOpacity}
-                            gradient={airHeatmapGradient}
-                        />
-                    </FeatureGroup>
-                </LayersControl.Overlay>
-            </LayersControl>
-
+            <FeatureGroup pathOptions={{ color: 'green', fillColor: 'green' }}>
+                <Popup>Popup in FeatureGroup</Popup>
+                <Circle center={[43.2965, 5.3698]} radius={200} />
+            </FeatureGroup>
             <div
                 style={{
                     position: "absolute",
-                    top: 10,
-                    left: "10%",
-                    transform: "translateX(-50%)",
+                    transform: "translateX(50%)",
+                    width: "50%",
+                    bottom: 10,
                     zIndex: 1000,
-                    backgroundColor: "white",
-                    border: "1px solid black",
+                    backgroundColor: "#ffffff77",
                     borderRadius: "5px",
                     padding: "10px",
                 }}
+                onMouseDown={disableMapInteraction}
+                onMouseUp={enableMapInteraction}
+                onTouchStart={disableMapInteraction}
+                onTouchEnd={enableMapInteraction}
             >
                 <div style={{marginBottom: "10px"}}>
-                    <label style={{display: "block", marginBottom: "5px"}}>Road Heatmap Opacity: </label>
+                    <label style={{display: "block", marginBottom: "5px"}}>Date: </label>
                     <input
                         type="range"
                         min="0"
@@ -161,41 +160,6 @@ const SimpleMap = () => {
                         onChange={(e) => setRoadOpacity(parseFloat(e.target.value))}
                         style={{width: "100%"}}
                     />
-                </div>
-
-                <div>
-                    <label style={{display: "block", marginBottom: "5px"}}>Air Heatmap Opacity: </label>
-                    <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.05"
-                        value={airOpacity}
-                        onChange={(e) => setAirOpacity(parseFloat(e.target.value))}
-                        style={{width: "100%"}}
-                    />
-                </div>
-
-                <div style={{marginTop: "20px"}}>
-                    <label>Select Year:</label>
-                    <select
-                        value={selectedYear}
-                        onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                        style={{
-                            width: "100%",
-                            padding: "5px",
-                            backgroundColor: "white",
-                            borderRadius: "5px",
-                            border: "1px solid black",
-                        }}
-                    >
-                        <option value={2018}>2018</option>
-                        <option value={2019}>2019</option>
-                        <option value={2020}>2020</option>
-                        <option value={2021}>2021</option>
-                        <option value={2022}>2022</option>
-                        <option value={2023}>2023</option>
-                    </select>
                 </div>
             </div>
         </MapContainer>
