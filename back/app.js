@@ -2,12 +2,17 @@
 
 const path = require("node:path");
 const AutoLoad = require("@fastify/autoload");
+const fastifyMultipart = require('@fastify/multipart');
 
 // Pass --options via CLI arguments in command to enable these options.
 const options = {};
 
 module.exports = async function (fastify, opts) {
   // Place here your custom code!
+
+  fastify.register(fastifyMultipart);
+
+
 
   // Do not touch the following lines
 
