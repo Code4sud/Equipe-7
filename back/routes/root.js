@@ -1,51 +1,54 @@
 "use strict";
 
-const OLLAMA_API_URL = 'http://localhost:11434'; // Adjust if your Ollama API is hosted elsewhere
+const { createClient } = require('@libsql/client');
+const csv = require('csv-parser');
+const { Readable } = require('stream');
+
+const turso = createClient({
+  url: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN
+})
 
 
 module.exports = async function (fastify, opts) {
   fastify.get("/api", async function (request, reply) {
-    return { root: true };
+    const res = await turso.execute('SELECT * FROM ITVmarseille')
+    console.log(res)
+    return { root: "iuhroi" };
   });
 
-  fastify.get("/api", async function (request, reply) {
-    return { root: true };
-  });
+  fastify.post('/upload', async (request, reply) => {
+    const data = [];
 
+    const parts = request.parts();
 
-  fastify.post('/api/ollama', async (request, reply) => {
-    const { prompt } = request.body;
+    for await (const part of parts) {
+      if (part.file) {
+        const results = [];
+        const readable = Readable.from(part.file);
 
-    const response = await ollama.chat({
-      model: 'llama3.1',
-      messages: [{ role: 'user', content: 'Why is the sky blue?' }],
-    })
-    console.log(response.message.content)
-
-
-    /*
-    fastify.post('/api/ollama', async (request, reply) => {
-  const { prompt } = request.body;
-
-  if (!prompt) {
-    return reply.status(400).send({ error: 'Prompt is required' });
-  }
-
-  try {
-    // Make a request to the Ollama API
-    const response = await axios.post(`${OLLAMA_API_URL}/v1/models/your-model-name/generate`, {
-      prompt,
-    });
-
-    // Return the response from Ollama
-    return reply.send(response.data);
-  } catch (error) {
-    // Log and handle errors
-    request.log.error(error);
-    return reply.status(500).send({ error: 'Failed to communicate with Ollama API' });
-  }
-});
-     */
+        readable
+            .pipe(csv())
+            .on('data', (row) => {
+              const res = Object.values(row)[0].split(";")
+              results.push({date:res[0], average:res[1]});
+            })
+            .on('end', async () => {
+              for (const row of results) {
+                try {
+                  console.log(row)
+                  await turso.execute(`INSERT INTO ITVmarseille (week, average) VALUES ( ${row.date}, ${row.average})`);
+                } catch (err) {
+                  fastify.log.error(err);
+                  return reply.code(500).send({ error: 'Failed to insert data into Turso' });
+                }
+              }
+              return reply.code(200).send({ message: 'Data successfully uploaded and inserted into Turso' });
+            });
+      } else {
+        data.push(part.value);
+      }
+    }
   });
 };
 
