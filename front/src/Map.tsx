@@ -17,17 +17,32 @@ const generatePollutionData = (
     const latStep = (latMax - latMin) / gridSize;
     const lonStep = (lonMax - lonMin) / gridSize;
 
+    const cityCenterLat = 43.2965;
+    const cityCenterLon = 5.3698;
+
+    const yearFactor = 1 - (year - 2018) * 0.05;
+
     for (let lat = latMin; lat <= latMax; lat += latStep) {
         for (let lon = lonMin; lon <= lonMax; lon += lonStep) {
-            // Simulate pollution data variation based on the year
-            const basePollutionLevel = pollutionType === "road" ? Math.random() * 70 : Math.random() * 100;
-            const yearFactor = (year - 2018) * 0.2; // Adjust pollution level by year (just an example)
-            const pollutionLevel = basePollutionLevel * (1 + yearFactor);
-            points.push([lat, lon, pollutionLevel]);
+            const distanceFromCenter = Math.sqrt(
+                Math.pow(lat - cityCenterLat, 2) + Math.pow(lon - cityCenterLon, 2)
+            );
+
+            const basePollutionLevel =
+                pollutionType === "road"
+                    ? Math.random() * 70 * (1 / (1 + distanceFromCenter))
+                    : Math.random() * 100 * (1 / (1 + distanceFromCenter));
+
+            const pollutionLevel = basePollutionLevel * yearFactor;
+
+            const noise = (Math.random() - 0.5) * 10;
+
+            points.push([lat, lon, pollutionLevel + noise]);
         }
     }
     return points;
 };
+
 
 const SimpleMap = () => {
     const mapRef = useRef(null);
