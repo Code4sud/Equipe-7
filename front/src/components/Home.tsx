@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import OverviewSection from "@/components/overView";
 import PollutionChart from '@/components/PollutionChart';
+import SimpleMap from '@/Map';
 
 const MotionCard = motion(Card)
 
@@ -26,7 +27,7 @@ export default function PollutionAwarenessPage() {
   }
 
   return (
-    <div className="min-h-screen bg-green-50 text-green-900">
+    <div className="min-h-screen bg-green-50 text-green-900 w-100">
       <header className="relative h-96 bg-green-800 text-white">
         <img
           src="/pollution2.jpg"
@@ -165,6 +166,33 @@ export default function PollutionAwarenessPage() {
               ))}
             </motion.div>
           </section>
+
+          <section id="pollution-map" className="w-full bg-green-100 py-20">
+          <div className="container mx-auto px-4">
+            <motion.h2 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 text-green-800 text-center"
+            >
+              Carte Interactive de la Pollution à Marseille
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-xl text-center mb-10 text-green-600"
+            >
+              Explorez la pollution de l'air et routière à travers les années
+            </motion.p>
+            <div className="w-full h-[600px] rounded-lg overflow-hidden shadow-xl">
+              <SimpleMap />
+            </div>
+            <p className="mt-8 text-center text-green-700 italic">
+              Utilisez les contrôles sur la carte pour ajuster l'opacité des couches et sélectionner l'année
+            </p>
+          </div>
+        </section>
 
           <section id="actions" className="py-20">
             <motion.h2 

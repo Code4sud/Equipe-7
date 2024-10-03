@@ -19,9 +19,8 @@ const generatePollutionData = (
 
     for (let lat = latMin; lat <= latMax; lat += latStep) {
         for (let lon = lonMin; lon <= lonMax; lon += lonStep) {
-            // Simulate pollution data variation based on the year
             const basePollutionLevel = pollutionType === "road" ? Math.random() * 70 : Math.random() * 100;
-            const yearFactor = (year - 2018) * 0.2; // Adjust pollution level by year (just an example)
+            const yearFactor = (year - 2018) * 0.2; 
             const pollutionLevel = basePollutionLevel * (1 + yearFactor);
             points.push([lat, lon, pollutionLevel]);
         }
