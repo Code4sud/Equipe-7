@@ -2,88 +2,36 @@ import {useEffect, useRef, useState} from "react";
 import {FeatureGroup, Popup, Circle, MapContainer, TileLayer} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L, { Map } from "leaflet";
-import {HeatmapLayerFactory} from "@vgrid/react-leaflet-heatmap-layer";
-
-const generatePollutionData = (
-    latMin: number,
-    latMax: number,
-    lonMin: number,
-    lonMax: number,
-    gridSize: number,
-    pollutionType: "road" | "air",
-    year: number
-) => {
-    const points = [];
-    const latStep = (latMax - latMin) / gridSize;
-    const lonStep = (lonMax - lonMin) / gridSize;
-
-    const cityCenterLat = 43.2965;
-    const cityCenterLon = 5.3698;
-
-    const yearFactor = 1 - (year - 2018) * 0.05;
-
-    for (let lat = latMin; lat <= latMax; lat += latStep) {
-        for (let lon = lonMin; lon <= lonMax; lon += lonStep) {
-            const distanceFromCenter = Math.sqrt(
-                Math.pow(lat - cityCenterLat, 2) + Math.pow(lon - cityCenterLon, 2)
-            );
-
-            const basePollutionLevel =
-                pollutionType === "road"
-                    ? Math.random() * 70 * (1 / (1 + distanceFromCenter))
-                    : Math.random() * 100 * (1 / (1 + distanceFromCenter));
-
-            const pollutionLevel = basePollutionLevel * yearFactor;
-
-            const noise = (Math.random() - 0.5) * 10;
-
-            points.push([lat, lon, pollutionLevel + noise]);
-        }
-    }
-    return points;
-};
+import {PolluantsList, data} from "./data"
 
 
 const SimpleMap = () => {
     const mapRef = useRef<Map>(null);
-    const [heatMapDataRoad, setHeatMapDataRoad] = useState<any[]>([]);
-    const [heatMapDataAir, setHeatMapDataAir] = useState<any[]>([]);
-    const [roadOpacity, setRoadOpacity] = useState(0.5);
-    const [airOpacity, setAirOpacity] = useState(0.5);
-    const [selectedYear, setSelectedYear] = useState(2023);
+    const [indexCurrentData, setIndexCurrentData] = useState(0);
+    const [ color, setColor] = useState('')
 
     const latitude = 43.2965;
     const longitude = 5.3698;
 
-    const HeatmapLayer = HeatmapLayerFactory<[number, number, number]>();
-
     const bounds = L.latLngBounds([43.1, 5.1], [43.5, 5.6]);
 
-    useEffect(() => {
-        const roadData = generatePollutionData(43.1, 43.5, 5.1, 5.6, 100, "road", selectedYear);
-        const airData = generatePollutionData(43.1, 43.5, 5.1, 5.6, 100, "air", selectedYear);
-
-        setHeatMapDataRoad(roadData);
-        setHeatMapDataAir(airData);
-    }, [selectedYear]);
-
-    const roadHeatmapGradient = {
-        0.0: "#FF0000",
-        0.2: "#FFA500",
-        0.4: "#FFFF00",
-        0.6: "#008000",
-        0.8: "#0000FF",
-        1.0: "#800080",
-    };
-
-    const airHeatmapGradient = {
-        0.0: "#4B0082",
-        0.2: "#8B0000",
-        0.4: "#FFA500",
-        0.6: "#9ACD32",
-        0.8: "#90EE90",
-        1.0: "#ADD8E6",
-    };
+    const months = [
+        "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+        "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+      ];
+      
+    const colors = [
+        "#00FF00", // Vert (très faible pollution)
+        "#7FFF00",
+        "#ADFF2F",
+        "#FFFF00", // Jaune (pollution modérée)
+        "#FFD700",
+        "#FFA500",
+        "#FF8C00",
+        "#FF4500",
+        "#FF0000", // Rouge (pollution élevée)
+        "#8B0000"  // Rouge foncé (pollution très élevée)
+      ];
 
     const disableMapInteraction = () => {
         if (mapRef.current) {
@@ -109,6 +57,44 @@ const SimpleMap = () => {
         }
     };
 
+    const getColorFromGradient = (value: number): string => {
+        const idx = Math.floor(value/6);
+
+        if(idx > 9) return colors[9];
+        else if(idx < 0) return colors[0];
+        return colors[idx];
+    };
+
+    const formatDate = (dateStr: string): string => {
+        const [year, month] = dateStr.split("-");
+        const monthIndex = parseInt(month) - 1;
+        
+        return `${months[monthIndex]} ${year}`;
+    };
+
+    const [ date, setDate ] = useState(formatDate(data.at(indexCurrentData)!.date))
+
+    useEffect(() => {
+        setDate(formatDate(data[indexCurrentData].date))
+        // Logique pour mettre à jour la couleur en fonction des taux de pollution
+        const currentPollutionData: PolluantsList = data[indexCurrentData]?.pollutants;
+
+        if (currentPollutionData) {
+            // Utilisation d'une moyenne simple des baselines pour déterminer la couleur
+            const totalPollution =
+                    currentPollutionData.SO2?.baseline +
+                    currentPollutionData.NO?.baseline +
+                    currentPollutionData.NO2?.baseline +
+                    currentPollutionData.NOx?.baseline +
+                    currentPollutionData.PM10?.baseline +
+                    currentPollutionData.PM25?.baseline;
+
+            // Trouver une couleur appropriée dans le gradient
+            const newColor = getColorFromGradient(totalPollution);
+            setColor(newColor);
+        }
+    }, [indexCurrentData]);
+
     return (
         <MapContainer
             center={[latitude, longitude]}
@@ -129,37 +115,28 @@ const SimpleMap = () => {
                 url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
             />
 
-            <FeatureGroup pathOptions={{ color: 'green', fillColor: 'green' }}>
+            <FeatureGroup pathOptions={{ color: color, fillColor: color, fillOpacity: 0.6 }}>
                 <Popup>Popup in FeatureGroup</Popup>
-                <Circle center={[43.2965, 5.3698]} radius={200} />
+                <Circle center={[43.2965, 5.3698]} radius={5000} />
             </FeatureGroup>
             <div
-                style={{
-                    position: "absolute",
-                    transform: "translateX(50%)",
-                    width: "50%",
-                    bottom: 10,
-                    zIndex: 1000,
-                    backgroundColor: "#ffffff77",
-                    borderRadius: "5px",
-                    padding: "10px",
-                }}
-                onMouseDown={disableMapInteraction}
-                onMouseUp={enableMapInteraction}
-                onTouchStart={disableMapInteraction}
-                onTouchEnd={enableMapInteraction}
+                className="absolute bottom-4 translate-x-1/2 w-1/2 z-[1000]"
             >
-                <div style={{marginBottom: "10px"}}>
-                    <label style={{display: "block", marginBottom: "5px"}}>Date: </label>
+                <div className="flex flex-col justify-center items-center gap-4">
                     <input
+                        className="w-full appearance-none bg-transparent [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-black/25 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-[25px] [&::-webkit-slider-thumb]:w-[25px] [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
                         type="range"
                         min="0"
-                        max="1"
-                        step="0.05"
-                        value={roadOpacity}
-                        onChange={(e) => setRoadOpacity(parseFloat(e.target.value))}
-                        style={{width: "100%"}}
+                        max={data.length-1}
+                        step="1"
+                        value={indexCurrentData}
+                        onChange={(e) => setIndexCurrentData(parseInt(e.target.value))}
+                        onMouseDown={disableMapInteraction}
+                        onMouseUp={enableMapInteraction}
+                        onTouchStart={disableMapInteraction}
+                        onTouchEnd={enableMapInteraction}
                     />
+                    <p className="bg-white bg-opacity-70 rounded-lg py-2 px-4 text-xl">{ date }</p>
                 </div>
             </div>
         </MapContainer>
