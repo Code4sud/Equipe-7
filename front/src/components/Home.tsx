@@ -1,12 +1,12 @@
-"use client"
-
-import { Wind, Car, Factory, Droplets, CloudFog, Plane } from 'lucide-react';
-import { motion } from 'framer-motion'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Droplets, CloudFog } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import OverviewSection from "@/components/overView";
 
 const MotionCard = motion(Card)
 
 export default function PollutionAwarenessPage() {
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -54,40 +54,7 @@ export default function PollutionAwarenessPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <section id="overview" className="py-20">
-          <motion.h2 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-10 text-green-800"
-          >
-            La pollution de l'air à Marseille
-          </motion.h2>
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid md:grid-cols-3 gap-6"
-          >
-            {[
-              { icon: Plane, title: "Trafic aérien", description: "Impact du trafic aérien sur la qualité de l'air." },
-              { icon: Car, title: "Trafic routier", description: "Impact du trafic routier sur la qualité de l'air." },
-              { icon: Factory, title: "Activités industrielles", description: "Contribution des industries à la pollution atmosphérique." },
-            ].map((item, index) => (
-              <MotionCard key={index} variants={itemVariants} className="transition-all hover:shadow-lg bg-white border-green-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2 text-green-700">
-                    <item.icon className="w-6 h-6 text-green-600" />
-                    <span>{item.title}</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-green-800">{item.description}</p>
-                </CardContent>
-              </MotionCard>
-            ))}
-          </motion.div>
-        </section>
+        <OverviewSection />
 
         <section id="key-figures" className="py-20">
           <motion.h2 
@@ -200,10 +167,3 @@ export default function PollutionAwarenessPage() {
     </div>
   )
 }
-
-
-
-
-
-
-
