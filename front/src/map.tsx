@@ -10,7 +10,8 @@ const generatePollutionData = (
     lonMin: number,
     lonMax: number,
     gridSize: number,
-    pollutionType: "road" | "air"
+    pollutionType: "road" | "air",
+    year: number
 ) => {
     const points = [];
     const latStep = (latMax - latMin) / gridSize;
@@ -18,7 +19,10 @@ const generatePollutionData = (
 
     for (let lat = latMin; lat <= latMax; lat += latStep) {
         for (let lon = lonMin; lon <= lonMax; lon += lonStep) {
-            const pollutionLevel = pollutionType === "road" ? Math.random() * 70 : Math.random() * 100;
+            // Simulate pollution data variation based on the year
+            const basePollutionLevel = pollutionType === "road" ? Math.random() * 70 : Math.random() * 100;
+            const yearFactor = (year - 2018) * 0.2; // Adjust pollution level by year (just an example)
+            const pollutionLevel = basePollutionLevel * (1 + yearFactor);
             points.push([lat, lon, pollutionLevel]);
         }
     }
@@ -31,6 +35,7 @@ const SimpleMap = () => {
     const [heatMapDataAir, setHeatMapDataAir] = useState<any[]>([]);
     const [roadOpacity, setRoadOpacity] = useState(0.5);
     const [airOpacity, setAirOpacity] = useState(0.5);
+    const [selectedYear, setSelectedYear] = useState(2023);
 
     const latitude = 43.2965;
     const longitude = 5.3698;
@@ -40,12 +45,12 @@ const SimpleMap = () => {
     const bounds = L.latLngBounds([43.1, 5.1], [43.5, 5.6]);
 
     useEffect(() => {
-        const roadData = generatePollutionData(43.1, 43.5, 5.1, 5.6, 100, "road");
-        const airData = generatePollutionData(43.1, 43.5, 5.1, 5.6, 100, "air");
+        const roadData = generatePollutionData(43.1, 43.5, 5.1, 5.6, 100, "road", selectedYear);
+        const airData = generatePollutionData(43.1, 43.5, 5.1, 5.6, 100, "air", selectedYear);
 
         setHeatMapDataRoad(roadData);
         setHeatMapDataAir(airData);
-    }, []);
+    }, [selectedYear]);
 
     const roadHeatmapGradient = {
         0.0: "#FF0000",
@@ -154,6 +159,28 @@ const SimpleMap = () => {
                         onChange={(e) => setAirOpacity(parseFloat(e.target.value))}
                         style={{width: "100%"}}
                     />
+                </div>
+
+                <div style={{marginTop: "20px"}}>
+                    <label>Select Year:</label>
+                    <select
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                        style={{
+                            width: "100%",
+                            padding: "5px",
+                            backgroundColor: "white",
+                            borderRadius: "5px",
+                            border: "1px solid black",
+                        }}
+                    >
+                        <option value={2018}>2018</option>
+                        <option value={2019}>2019</option>
+                        <option value={2020}>2020</option>
+                        <option value={2021}>2021</option>
+                        <option value={2022}>2022</option>
+                        <option value={2023}>2023</option>
+                    </select>
                 </div>
             </div>
         </MapContainer>
