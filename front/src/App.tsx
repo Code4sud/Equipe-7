@@ -1,12 +1,15 @@
 import SimpleMap from "@/map.tsx";
+import Home from "@/components/Home"
 
 function App() {
     return (
         <div>
-            <h1>My Leaflet.js and React Map</h1>
+            <Home/>
             <SimpleMap/>
         </div>
     );
 }
 
 export default App;
+
+
