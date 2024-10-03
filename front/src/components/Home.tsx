@@ -116,7 +116,7 @@ export default function PollutionAwarenessPage() {
             >
               <PollutionChart />
             </motion.div>
-            <p className="mt-8 text-center text-black">
+            <p className="mt-8 text-center text-black italic">
               Source: Données collectées par les stations de mesure de la qualité de l'air à Marseille
             </p>
           </div>
