@@ -1,4 +1,4 @@
-import SimpleMap from "@/map.tsx";
+import SimpleMap from "@/Map.tsx";
 
 function App() {
     return (
