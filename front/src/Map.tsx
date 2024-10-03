@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import {FeatureGroup, Popup, Circle, MapContainer, TileLayer} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import L, { Map } from "leaflet";
 import {HeatmapLayerFactory} from "@vgrid/react-leaflet-heatmap-layer";
 
 const generatePollutionData = (
@@ -45,7 +45,7 @@ const generatePollutionData = (
 
 
 const SimpleMap = () => {
-    const mapRef = useRef(null);
+    const mapRef = useRef<Map>(null);
     const [heatMapDataRoad, setHeatMapDataRoad] = useState<any[]>([]);
     const [heatMapDataAir, setHeatMapDataAir] = useState<any[]>([]);
     const [roadOpacity, setRoadOpacity] = useState(0.5);
