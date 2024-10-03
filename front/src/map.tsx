@@ -87,8 +87,6 @@ const SimpleMap = () => {
                 <LayersControl.Overlay name="Road Pollution Heatmap" checked>
                     <FeatureGroup pathOptions={{color: "purple"}}>
                         <HeatmapLayer
-                            fitBoundsOnLoad
-                            fitBoundsOnUpdate
                             points={heatMapDataRoad}
                             longitudeExtractor={(m) => m[1]}
                             latitudeExtractor={(m) => m[0]}
@@ -105,8 +103,6 @@ const SimpleMap = () => {
                 <LayersControl.Overlay name="Air Pollution Heatmap" checked>
                     <FeatureGroup pathOptions={{color: "purple"}}>
                         <HeatmapLayer
-                            fitBoundsOnLoad
-                            fitBoundsOnUpdate
                             points={heatMapDataAir}
                             longitudeExtractor={(m) => m[1]}
                             latitudeExtractor={(m) => m[0]}
