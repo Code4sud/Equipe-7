@@ -125,7 +125,7 @@ const SimpleMap = () => {
             </FeatureGroup>
 
             <div className="absolute top-4 right-4 z-[1000]">
-                <div className="bg-white bg-opacity-70 rounded-lg p-2 flex gap-2">
+                <div className="bg-white bg-opacity-70 rounded-lg p-2 flex gap">
                     <div className="flex flex-col justify-between items-end">
                         <p>100</p>
                         <p>50</p>
@@ -138,7 +138,7 @@ const SimpleMap = () => {
                     
             </div>
 
-            <div className="absolute bottom-4 left-4 z-[1000] flex gap-4">
+            <div className="absolute lg:bottom-4 lg:top-auto top-4 bottom-auto left-4 z-[1000] flex gap-4">
                 <div className="flex flex-col justify-center items-center gap-2">
                     <label className="bg-white bg-opacity-70 rounded-lg p-2">Trafic aérien</label>
                     <Switcher isChecked={isCheckedPlane} setIsChecked={(value) => {setIsCheckedPlane(value)}}></Switcher>
