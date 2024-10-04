@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import OverviewSection from "@/components/overView";
 import PollutionChart from '@/components/PollutionChart';
 import SimpleMap from '@/Map';
-import Chiffre from "@/components/Chiffre"
+import Chiffre from "@/components/ui/Chiffre"
 
 const MotionCard = motion(Card)
 
