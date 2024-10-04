@@ -41,7 +41,7 @@ export default function PollutionAwarenessPage() {
             transition={{ duration: 0.5 }}
             className="text-5xl font-bold mb-4 text-center"
           >
-            Respirons Mieux Marseille
+            EPSILON
           </motion.h1>
           <motion.p 
             initial={{ y: 20, opacity: 0 }}
