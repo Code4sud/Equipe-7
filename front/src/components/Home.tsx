@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import OverviewSection from "@/components/overView";
 import PollutionChart from '@/components/PollutionChart';
 import SimpleMap from '@/Map';
+import Chiffre from "@/components/Chiffre"
 
 const MotionCard = motion(Card)
 
@@ -58,37 +59,7 @@ export default function PollutionAwarenessPage() {
         <div className="container mx-auto px-4">
           <OverviewSection />
 
-          <section id="key-figures" className="py-20">
-            <motion.h2 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-10 text-green-800"
-            >
-              Chiffres clés
-            </motion.h2>
-            <motion.div 
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid md:grid-cols-3 gap-6"
-            >
-              {[
-                { value: "68%", label: "des Marseillais exposés à la pollution" },
-                { value: "1500 - 2500", label: "décès prématurés par an" },
-                { value: "40%", label: "des émissions dues au trafic" },
-              ].map((stat, index) => (
-                <MotionCard key={index} variants={itemVariants} className="text-center transition-all hover:shadow-lg bg-white border-green-200">
-                  <CardHeader>
-                    <CardTitle className="text-5xl font-bold text-green-600">{stat.value}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-lg text-green-800">{stat.label}</p>
-                  </CardContent>
-                </MotionCard>
-              ))}
-            </motion.div>
-          </section>
+          <Chiffre/>
         </div>
 
         <section id="pollution-chart" className="w-full bg-white py-20">
