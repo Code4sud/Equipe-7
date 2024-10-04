@@ -1,5 +1,3 @@
-import React, { useState } from 'react'
-
 type SwitcherProps = {
   isChecked: boolean;
   setIsChecked: (value: boolean) => void;
