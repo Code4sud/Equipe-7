@@ -3,11 +3,14 @@ import {FeatureGroup, Popup, Circle, MapContainer, TileLayer} from "react-leafle
 import "leaflet/dist/leaflet.css";
 import L, { Map } from "leaflet";
 import {PolluantsList, data} from "./data"
+import Switcher from "./components/ui/switch";
 
 
 const SimpleMap = () => {
     const mapRef = useRef<Map>(null);
     const [indexCurrentData, setIndexCurrentData] = useState(0);
+    const [isCheckedPlane, setIsCheckedPlane] = useState(true);
+    const [isCheckedCar, setIsCheckedCar] = useState(true);
     const [ color, setColor] = useState('')
 
     const latitude = 43.2965;
@@ -20,17 +23,17 @@ const SimpleMap = () => {
         "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
       ];
       
-    const colors = [
-        "#00FF00", // Vert (très faible pollution)
-        "#7FFF00",
-        "#ADFF2F",
-        "#FFFF00", // Jaune (pollution modérée)
-        "#FFD700",
-        "#FFA500",
-        "#FF8C00",
-        "#FF4500",
-        "#FF0000", // Rouge (pollution élevée)
-        "#8B0000"  // Rouge foncé (pollution très élevée)
+      const colors = [
+        "#56C121", "#5CC321", "#62C421", "#68C621", "#6EC821", "#74C921", "#7ACB21", "#80CD21", "#86CF21", "#8CD021",
+        "#92D221", "#98D421", "#9ED621", "#A4D821", "#AAD921", "#B0DB21", "#B6DD21", "#BCDF21", "#C2E021", "#C8E221",
+        "#CEE421", "#D4E621", "#DAE721", "#E0E921", "#E6EB21", "#ECEC21", "#F2EE21", "#F7F021", "#FBF121", "#FFF201",
+        "#FFE602", "#FFDA03", "#FFCE05", "#FFC207", "#FFB609", "#FFAA0A", "#FF9F0C", "#FF930E", "#FF8710", "#FF7B12",
+        "#FF6F13", "#FF6315", "#FF5717", "#FF4B19", "#FF3F1B", "#FF331C", "#FF271E", "#FF1B20", "#FF0F22", "#FF0324",
+        "#FE2531", "#FE2B33", "#FE3035", "#FE3637", "#FE3C39", "#FE423B", "#FE473D", "#FE4D3F", "#FE5341", "#FE5943",
+        "#FE5E45", "#FE6447", "#FE6A49", "#FE704B", "#FE754D", "#FE7C01", "#FE7D0E", "#FE7E1A", "#FE7F27", "#FE8033",
+        "#FE813F", "#FE824C", "#FE8358", "#FE8465", "#FE8571", "#FE867E", "#FE878A", "#FE8897", "#FE89A3", "#FE8AAF",
+        "#FE8BBC", "#FE8CC8", "#FE8DD5", "#FE8EE1", "#FE8FED", "#FE90FA", "#FF000B", "#FF0411", "#FF0817", "#FF0C1D",
+        "#FF1023", "#FF1429", "#FF182F", "#FF1C35", "#FF203B", "#FF2441", "#FF2847", "#FF2C4D", "#FF3053", "#FF3459"
       ];
 
     const disableMapInteraction = () => {
@@ -58,9 +61,10 @@ const SimpleMap = () => {
     };
 
     const getColorFromGradient = (value: number): string => {
-        const idx = Math.floor(value/6);
+        console.log(value);
+        const idx = Math.floor(value);
 
-        if(idx > 9) return colors[9];
+        if(idx > 99) return colors[99];
         else if(idx < 0) return colors[0];
         return colors[idx];
     };
@@ -77,17 +81,17 @@ const SimpleMap = () => {
     useEffect(() => {
         setDate(formatDate(data[indexCurrentData].date))
         // Logique pour mettre à jour la couleur en fonction des taux de pollution
-        const currentPollutionData: PolluantsList = data[indexCurrentData]?.pollutants;
+        const currentPollutionData: PolluantsList = data[indexCurrentData];
 
         if (currentPollutionData) {
             // Utilisation d'une moyenne simple des baselines pour déterminer la couleur
             const totalPollution =
-                    currentPollutionData.SO2?.baseline +
-                    currentPollutionData.NO?.baseline +
-                    currentPollutionData.NO2?.baseline +
-                    currentPollutionData.NOx?.baseline +
-                    currentPollutionData.PM10?.baseline +
-                    currentPollutionData.PM25?.baseline;
+                    (currentPollutionData.SO2?.baseline ?? 0) +
+                    (currentPollutionData.NO?.baseline ?? 0) +
+                    (currentPollutionData.NO2?.baseline ?? 0) +
+                    (currentPollutionData.NOx?.baseline ?? 0) +
+                    (currentPollutionData.PM10?.baseline ?? 0) +
+                    (currentPollutionData["PM2.5"]?.baseline ?? 0);
 
             // Trouver une couleur appropriée dans le gradient
             const newColor = getColorFromGradient(totalPollution);
@@ -98,9 +102,9 @@ const SimpleMap = () => {
     return (
         <MapContainer
             center={[latitude, longitude]}
-            zoom={13}
-            maxZoom={13}
-            minZoom={13}
+            zoom={11}
+            minZoom={11}
+            maxZoom={11}
             maxBounds={bounds}
             maxBoundsViscosity={1.0}
             ref={mapRef}
@@ -119,6 +123,31 @@ const SimpleMap = () => {
                 <Popup>Popup in FeatureGroup</Popup>
                 <Circle center={[43.2965, 5.3698]} radius={5000} />
             </FeatureGroup>
+
+            <div className="absolute top-4 right-4 z-[1000]">
+                <div className="bg-white bg-opacity-70 rounded-lg p-2 flex gap-2">
+                    <div className="flex flex-col justify-between items-end">
+                        <p>100</p>
+                        <p>50</p>
+                        <p>0</p>
+                    </div>
+                    <div className="bg-gradient w-4 h-40 rounded-md">
+
+                    </div>
+                </div>
+                    
+            </div>
+
+            <div className="absolute bottom-4 left-4 z-[1000] flex gap-4">
+                <div className="flex flex-col justify-center items-center gap-2">
+                    <label className="bg-white bg-opacity-70 rounded-lg p-2">Trafic aérien</label>
+                    <Switcher isChecked={isCheckedPlane} setIsChecked={(value) => {setIsCheckedPlane(value)}}></Switcher>
+                </div>
+                <div className="flex flex-col justify-center items-center gap-2">
+                    <label className="bg-white bg-opacity-70 rounded-lg p-2">Trafic routier</label>
+                    <Switcher isChecked={isCheckedCar} setIsChecked={(value) => {setIsCheckedCar(value)}}></Switcher>
+                </div>
+            </div>
             <div
                 className="absolute bottom-4 translate-x-1/2 w-1/2 z-[1000]"
             >

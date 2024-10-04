@@ -189,7 +189,7 @@ export default function PollutionAwarenessPage() {
               <SimpleMap />
             </div>
             <p className="mt-8 text-center text-green-700 italic">
-              Utilisez les contrôles sur la carte pour ajuster l'opacité des couches et sélectionner l'année
+              Utilisez les contrôles sur la carte pour sélectionner la date et ajouter ou retirer l'impact de l'activité humaine sur l'environnement
             </p>
           </div>
         </section>
